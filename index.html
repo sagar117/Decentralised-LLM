@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Decentralized LLM Query</title>
+</head>
+<body>
+    <h1>Ask GPT-2 Network</h1>
+    <textarea id="query" rows="4" cols="50"></textarea><br>
+    <button id="submitBtn">Submit</button>
+    <p id="response"></p>
+
+    <script>
+        async function submitQuery() {
+            let query = document.getElementById("query").value;
+            let res = await fetch("http://127.0.0.1:8000/submit_query/", {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({"query": query})
+            });
+            let data = await res.json();
+            document.getElementById("response").innerText = JSON.stringify(data, null, 2);
+        }
+
+        document.getElementById("submitBtn").addEventListener("click", submitQuery);
+    </script>
+</body>
+</html>
