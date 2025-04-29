@@ -1,20 +1,24 @@
-🧠 Decentralized LLM Network
+# 🧐 Decentralized LLM Network
 
 An open-source, decentralized network for running and querying Large Language Models (LLMs) across multiple peer nodes. Built using FastAPI, IPFS, and Transformers, this project enables serverless AI inference powered by IPFS-based node discovery.
 
 No central coordinator. No cloud lock-in. Just distributed AI.
 
-🚀 Key Features
+---
 
-Peer-to-peer LLM serving: Each node runs an LLM and registers itself into a blockchain-style registry.
+## 🚀 Key Features
 
-IPFS-based node discovery: Nodes update and sync through blockchain.json published on IPFS.
+- **Peer-to-peer LLM serving**: Each node runs an LLM and registers itself into a blockchain-style registry.
+- **IPFS-based node discovery**: Nodes update and sync through `blockchain.json` published on IPFS.
+- **Frontend queries via IPFS lookup**: Simple HTML interface queries any random live node.
+- **FastAPI + Transformers backend**: Easy to run, extend, or modify.
+- **Fully open-source and hackable** 💥
 
-Frontend queries via IPFS lookup: Simple HTML interface queries any random live node.
+---
 
-FastAPI + Transformers backend: Easy to run, extend, or modify.
+## 📁 Project Structure
 
-Fully open-source and hackable 💥
+
 
 📁 Project Structure
 
@@ -86,8 +90,36 @@ Always upload blockchain.json inside a folder using ipfs add -r blockchain_folde
 
 Use the folder CID in frontend: https://ipfs.io/ipfs/<folder-cid>/blockchain.json
 
-📡 Roadmap
+🛁 Roadmap
+🚀 Upcoming Features
+ 🔄 Node heartbeat to mark active/inactive nodes
 
+ 🌐 IPNS support for live updating blockchain CID
+
+ ⚙️ CLI tool to register, monitor, and remove nodes easily
+
+ 💬 Frontend improvements for query logs and error display
+
+ 📱 Mobile-friendly frontend UI
+
+ 🧠 Multi-model support (GPT-2, Mistral, LLaMA, etc.)
+
+ 🔐 Node authentication and signed registration
+
+ 💰 Token-based economy for incentivizing node participation
+
+ 📊 Node explorer dashboard (uptime, performance, metadata)
+
+ 🚦 Reputation system for ranking reliable nodes
+
+⏳ Pending Development
+ Node heartbeat implementation (scheduled self-update)
+
+ Auto-node expiry or status toggling for offline peers
+
+ IPNS name pinning with periodic publishing
+
+ CID auto-update relay (push to GitHub or public DB)
 
 
 📜 License
