@@ -90,6 +90,7 @@ Use the folder CID in frontend: https://ipfs.io/ipfs/<folder-cid>/blockchain.jso
 ## 🛁 Roadmap
 
 🚀 Upcoming Features
+
  🔄 Node heartbeat to mark active/inactive nodes
 
  🌐 IPNS support for live updating blockchain CID
