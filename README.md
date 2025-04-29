@@ -88,6 +88,7 @@ Always upload blockchain.json inside a folder using ipfs add -r blockchain_folde
 Use the folder CID in frontend: https://ipfs.io/ipfs/<folder-cid>/blockchain.json
 
 ## 🛁 Roadmap
+
 🚀 Upcoming Features
  🔄 Node heartbeat to mark active/inactive nodes
 
