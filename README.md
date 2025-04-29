@@ -19,9 +19,6 @@ No central coordinator. No cloud lock-in. Just distributed AI.
 ## 📁 Project Structure
 
 
-
-📁 Project Structure
-
 decentralized-llm-network/
 ├── node/                  # Backend node implementation
 │   ├── node.py
@@ -37,9 +34,9 @@ decentralized-llm-network/
 ├── requirements.txt       # Python dependencies
 └── .gitignore             # Files to ignore
 
-🧑‍💻 Getting Started
+##🧑‍💻 Getting Started
 
-📦 Prerequisites
+##📦 Prerequisites
 
 Python 3.10+
 
@@ -54,7 +51,7 @@ git clone https://github.com/yourusername/decentralized-llm-network.git
 cd decentralized-llm-network
 pip install -r requirements.txt
 
-🚀 Start a Node
+##🚀 Start a Node
 
 cd node/
 uvicorn node:app --host 0.0.0.0 --port 8001
@@ -69,14 +66,14 @@ Re-upload new version to IPFS
 
 Save updated CID to current_cid.txt
 
-🌐 Open Frontend
+##🌐 Open Frontend
 
 cd frontend/
 open index.html  # or just drag it into a browser
 
 Make sure to update the CID in index.html to the latest IPFS folder CID that includes blockchain.json
 
-🛠️ Configuration
+##🛠️ Configuration
 
 In node.py:
 
@@ -84,13 +81,13 @@ Set your NODE_HOST and NODE_PORT
 
 GPT-2 is the default model (you can change it)
 
-🔗 IPFS Notes
+##🔗 IPFS Notes
 
 Always upload blockchain.json inside a folder using ipfs add -r blockchain_folder
 
 Use the folder CID in frontend: https://ipfs.io/ipfs/<folder-cid>/blockchain.json
 
-🛁 Roadmap
+##🛁 Roadmap
 🚀 Upcoming Features
  🔄 Node heartbeat to mark active/inactive nodes
 
@@ -122,15 +119,15 @@ Use the folder CID in frontend: https://ipfs.io/ipfs/<folder-cid>/blockchain.jso
  CID auto-update relay (push to GitHub or public DB)
 
 
-📜 License
+##📜 License
 
 MIT License. Feel free to use, modify, and build on top of it.
 
-🤝 Contributing
+##🤝 Contributing
 
 PRs are welcome! Please create issues if you find bugs or want to suggest enhancements.
 
-🙌 Acknowledgments
+##🙌 Acknowledgments
 
 Hugging Face Transformers
 
