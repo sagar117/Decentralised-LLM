@@ -1,0 +1,8 @@
+[
+  {
+    "host": "192.168.1.5",
+    "port": 8001,
+    "model": "gpt2",
+    "status": "active"
+  }
+]
