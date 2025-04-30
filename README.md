@@ -48,7 +48,9 @@ ipfs daemon
 🔧 Installation
 
 git clone https://github.com/sagar117/Decentralised-LLM.git
-cd decentralized-llm-network
+
+cd Decentralised-LLM
+
 pip install -r requirements.txt
 
 ## 🚀 Start a Node
