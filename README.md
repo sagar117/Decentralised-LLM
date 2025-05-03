@@ -1,143 +1,249 @@
-# 🧐 Decentralized LLM Network
 
-An open-source, decentralized network for running and querying Large Language Models (LLMs) across multiple peer nodes. Built using FastAPI, IPFS, and Transformers, this project enables serverless AI inference powered by IPFS-based node discovery.
+# 🧠 Decentralized LLM Network
 
-No central coordinator. No cloud lock-in. Just distributed AI.
+An open-source, decentralized network for running and querying Large Language Models (LLMs) across distributed peer nodes. Built using **FastAPI**, **IPFS**, and **HuggingFace Transformers**, this project enables serverless, censorship-resistant AI inference powered by decentralized coordination.
+
+> ⚡ No central server. No cloud lock-in. Just distributed intelligence.
 
 ---
 
-## 🚀 Key Features
+## 🧩 Features
 
-- **Peer-to-peer LLM serving**: Each node runs an LLM and registers itself into a blockchain-style registry.
-- **IPFS-based node discovery**: Nodes update and sync through `blockchain.json` published on IPFS.
-- **Frontend queries via IPFS lookup**: Simple HTML interface queries any random live node.
-- **FastAPI + Transformers backend**: Easy to run, extend, or modify.
-- **Fully open-source and hackable** 💥
+- ⚙️ **Decentralized Node Discovery** via `blockchain.json` on IPFS  
+- 🚀 **Peer-to-peer LLM Serving** — GPT-2 or any HuggingFace model  
+- 🌐 **Frontend Control Panel**: View active nodes and their metadata  
+- 🛡 **No centralized backend**  
+- 🔄 **Coordinator auto-picks live node** and routes query  
+- 🔧 **Configurable via `node_config.json`**
+
+---
+
+## 📐 Architecture
+
+```mermaid
+graph TD
+    UI[Frontend UI] --> FS[Frontend Server]
+    FS --> CO[Coordinator]
+    CO --> N1[Node 1]
+    CO --> N2[Node 2]
+    CO --> N3[Node N]
+    N1 --> IPFS[IPFS - blockchain.json]
+    N2 --> IPFS
+    N3 --> IPFS
+    IPFS --> FS
+```
 
 ---
 
 ## 📁 Project Structure
 
-
+```
 decentralized-llm-network/
-├── node/                  # Backend node implementation
+├── node/                      # Node server running LLM
 │   ├── node.py
-│   ├── ipfs_blockchain.py
-│   ├── current_cid.txt    # Contains latest folder CID from IPFS
-│   └── blockchain.json     # Node registry (managed via IPFS)
+│   ├── node_config.json       # Metadata for registration
+│   ├── current_cid.txt        # IPFS CID reference
+│   └── blockchain_folder/
+│       └── blockchain.json    # Decentralized registry
 │
-├── frontend/              # Minimalistic frontend
-│   └── index.html         # Query UI
+├── coordinator/               # Load balancer & query router
+│   └── coordinator.py
 │
-├── README.md              # You're here!
-├── LICENSE                # MIT License
-├── requirements.txt       # Python dependencies
-└── .gitignore             # Files to ignore
+├── frontend/                  # HTML + JS client
+│   └── index.html
+│
+├── frontend_server.py         # Serves frontend & proxies IPFS
+├── requirements.txt
+├── README.md
+├── LICENSE
+└── .gitignore
+```
 
-## 🧑‍💻 Getting Started
+---
 
-## 📦 Prerequisites
+## ⚙️ Prerequisites
 
-Python 3.10+
+- Python 3.10+
+- [IPFS CLI](https://docs.ipfs.tech/install/)
 
-IPFS installed and running:
-
+```bash
 ipfs init
 ipfs daemon
+```
 
-🔧 Installation
+---
 
+## 🚀 Getting Started
+
+### 1️⃣ Clone & Install
+
+```bash
 git clone https://github.com/sagar117/Decentralised-LLM.git
-
 cd Decentralised-LLM
-
 pip install -r requirements.txt
+```
 
-## 🚀 Start a Node
+---
 
-cd node/
-uvicorn node:app --host 0.0.0.0 --port 8001
+### 2️⃣ Start IPFS
+
+```bash
+ipfs daemon
+```
+
+---
+
+### 3️⃣ Launch a Node
+
+Edit the file `node/node_config.json`:
+
+```json
+{
+  "model": "gpt2",
+  "hardware": "CPU",
+  "max_tokens": 100,
+  "supports_streaming": false,
+  "inference_server": true
+}
+```
+
+Then run:
+
+```bash
+cd node
+uvicorn node:app --host 192.168.1.X --port 8001
+```
 
 This will:
 
-Fetch latest blockchain.json from IPFS (via current_cid.txt)
+- Load current `CID` from `current_cid.txt`
+- Download latest `blockchain.json`
+- Add this node's metadata
+- Re-upload new version to IPFS
+- Update `current_cid.txt` with new CID
 
-Add the node's info to it
+---
 
-Re-upload new version to IPFS
+### 4️⃣ Start the Frontend Server
 
-Save updated CID to current_cid.txt
+```bash
+python3 frontend_server.py
+```
 
-## 🌐 Open Frontend
+- Serves the UI at [http://127.0.0.1:5500](http://127.0.0.1:5500)
+- Serves `current_cid.txt` so frontend can access IPFS from JS
+- Prevents CORS issues
 
-cd frontend/
-open index.html  # or just drag it into a browser
+---
 
-Make sure to update the CID in index.html to the latest IPFS folder CID that includes blockchain.json
+### 5️⃣ Start the Coordinator
 
-## 🛠️ Configuration
+```bash
+cd coordinator
+uvicorn coordinator:app --port 8000
+```
 
-In node.py:
+- Reads latest `CID` from `current_cid.txt`
+- Pulls `blockchain.json` from IPFS
+- Picks a live node and forwards queries
 
-Set your NODE_HOST and NODE_PORT
+---
 
-GPT-2 is the default model (you can change it)
+## 🧠 Frontend Features
 
-## 🔗 IPFS Notes
+- 📡 Submit a prompt to any live node  
+- 🔍 Shows which node handled the request  
+- 💡 Displays metadata: IP, model, hardware  
+- 🌐 Fetches node list via IPFS  
 
-Always upload blockchain.json inside a folder using ipfs add -r blockchain_folder
+---
 
-Use the folder CID in frontend: https://ipfs.io/ipfs/<folder-cid>/blockchain.json
+## 🔐 Node Config Options
 
-## 🛁 Roadmap
+| Field              | Description                           |
+|--------------------|----------------------------------------|
+| `model`            | LLM to run (`gpt2`, `mistral`, etc.)   |
+| `hardware`         | Hardware type (`CPU`, `GPU`)           |
+| `max_tokens`       | Max token limit                        |
+| `supports_streaming` | Supports streamed inference          |
+| `inference_server` | Whether it's a full model runner       |
 
-🚀 Upcoming Features
+Defined in: `node_config.json`
 
- 🔄 Node heartbeat to mark active/inactive nodes
+---
 
- 🌐 IPNS support for live updating blockchain CID
+## 📦 IPFS Node Registry
 
- ⚙️ CLI tool to register, monitor, and remove nodes easily
+Each node updates a decentralized registry (`blockchain.json`) stored on IPFS.
 
- 💬 Frontend improvements for query logs and error display
+Example entry:
 
- 📱 Mobile-friendly frontend UI
+```json
+{
+  "host": "192.168.1.5",
+  "port": "8001",
+  "model": "gpt2",
+  "hardware": "CPU",
+  "max_tokens": 100,
+  "supports_streaming": false,
+  "inference_server": true,
+  "last_seen": "2025-05-03T14:00:00Z"
+}
+```
 
- 🧠 Multi-model support (GPT-2, Mistral, LLaMA, etc.)
+Updated via:
 
- 🔐 Node authentication and signed registration
+```bash
+ipfs add -r blockchain_folder
+```
 
- 💰 Token-based economy for incentivizing node participation
+CID saved in `current_cid.txt`
 
- 📊 Node explorer dashboard (uptime, performance, metadata)
+---
 
- 🚦 Reputation system for ranking reliable nodes
+## 🛣 Roadmap
 
-⏳ Pending Development
- Node heartbeat implementation (scheduled self-update)
+### ✅ In Progress
 
- Auto-node expiry or status toggling for offline peers
+- 🔄 Node heartbeat / last_seen updater  
+- 🧬 CID fallback retries + auto refresh  
+- 🌐 IPNS-based CID aliasing  
+- 🧪 Basic query logging + UI display  
 
- IPNS name pinning with periodic publishing
+---
 
- CID auto-update relay (push to GitHub or public DB)
+### 🧠 Future
 
+- 📊 Node dashboard with uptime & logs  
+- 🧬 Multi-model support (Mistral, LLaMA)  
+- 💬 Live chat UX in frontend  
+- 🔐 Signed node registrations  
+- 💰 Token reward system for serving nodes  
+- 🖥 CLI tool for node management  
 
-## 📜 License
+---
 
-MIT License. Feel free to use, modify, and build on top of it.
+## 🧾 License
+
+MIT License.  
+Free to use, fork, modify, and share.
+
+---
 
 ## 🤝 Contributing
 
-PRs are welcome! Please create issues if you find bugs or want to suggest enhancements.
+PRs welcome!  
+Please open issues for bugs, suggestions, or feature ideas.
 
-## 🙌 Acknowledgments
+---
 
-Hugging Face Transformers
+## 🙏 Acknowledgments
 
-FastAPI
+- 🤗 HuggingFace Transformers  
+- ⚡ FastAPI  
+- 🕸 IPFS  
+- 🧠 Open Source Community
 
-IPFS
+---
 
-Built with ❤️ for decentralizing intelligence.
-
+> Built with ❤️ to decentralize LLMs and democratize intelligence.
