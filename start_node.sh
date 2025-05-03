@@ -30,8 +30,8 @@ fi
 # Start the FastAPI app
 if command -v uvicorn &> /dev/null; then
   echo "🧠 Launching LLM node with uvicorn..."
-  uvicorn node.node:app --host 0.0.0.0 --port 8001
+  uvicorn node.node:app --host 127.0.0.1 --port 8001
 else
   echo "❌ 'uvicorn' not found in PATH. Trying fallback via python module..."
-  python3 -m uvicorn node.node:app --host 0.0.0.0 --port 8001
+  python3 -m uvicorn node.node:app --host 127.0.0.1 --port 8001
 fi

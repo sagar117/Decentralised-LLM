@@ -47,8 +47,10 @@ ipfs daemon
 
 🔧 Installation
 
-git clone https://github.com/yourusername/decentralized-llm-network.git
-cd decentralized-llm-network
+git clone https://github.com/sagar117/Decentralised-LLM.git
+
+cd Decentralised-LLM
+
 pip install -r requirements.txt
 
 ## 🚀 Start a Node
@@ -88,7 +90,9 @@ Always upload blockchain.json inside a folder using ipfs add -r blockchain_folde
 Use the folder CID in frontend: https://ipfs.io/ipfs/<folder-cid>/blockchain.json
 
 ## 🛁 Roadmap
+
 🚀 Upcoming Features
+
  🔄 Node heartbeat to mark active/inactive nodes
 
  🌐 IPNS support for live updating blockchain CID
