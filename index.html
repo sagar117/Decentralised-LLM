@@ -1,27 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Decentralized LLM Query</title>
+  <meta charset="UTF-8" />
+  <title>Decentralised LLM Control Panel</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f0f0f0; }
+    tr.selected { background-color: #d2ffd2; }
+    pre { white-space: pre-wrap; word-break: break-word; }
+  </style>
 </head>
 <body>
-    <h1>Ask GPT-2 Network</h1>
-    <textarea id="query" rows="4" cols="50"></textarea><br>
-    <button id="submitBtn">Submit</button>
-    <p id="response"></p>
 
-    <script>
-        async function submitQuery() {
-            let query = document.getElementById("query").value;
-            let res = await fetch("http://127.0.0.1:8000/submit_query/", {
-                method: "POST",
-                headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({"query": query})
-            });
-            let data = await res.json();
-            document.getElementById("response").innerText = JSON.stringify(data, null, 2);
-        }
+<h1>🧠 Decentralised LLM Control Panel</h1>
 
-        document.getElementById("submitBtn").addEventListener("click", submitQuery);
-    </script>
+<label for="query">Your Query:</label>
+<input type="text" id="query" size="60">
+<button onclick="submitQuery()">Submit</button>
+
+<h2>📡 Active Nodes</h2>
+<table id="nodes-table">
+  <thead>
+    <tr>
+      <th>Host</th>
+      <th>Port</th>
+      <th>Model</th>
+      <th>Hardware</th>
+      <th>Max Tokens</th>
+      <th>Streaming</th>
+      <th>Inference</th>
+      <th>Last Seen</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<h2>🧾 Response</h2>
+<pre id="response" style="background:#f9f9f9;padding:10px;border:1px solid #ddd;"></pre>
+
+<script>
+  const COORDINATOR_ENDPOINT = "http://127.0.0.1:8000/submit_query/";
+  const IPFS_GATEWAY = "https://ipfs.io/ipfs/";
+
+  async function loadNodes() {
+    const tbody = document.querySelector("#nodes-table tbody");
+    tbody.innerHTML = "";
+
+    try {
+      const cidRes = await fetch('/node/current_cid.txt');
+      if (!cidRes.ok) {
+        throw new Error("CID file not found or coordinator not running");
+      }
+
+      const cid = (await cidRes.text()).trim();
+      if (!cid || cid.includes("{") || cid.length < 20) {
+        throw new Error("Invalid CID: " + cid);
+      }
+
+      const res = await fetch(IPFS_GATEWAY + cid + "/blockchain.json");
+      const nodes = await res.json();
+
+      nodes.forEach((node, index) => {
+        const tr = document.createElement("tr");
+        tr.dataset.index = index;
+        tr.innerHTML = `
+          <td>${node.host}</td>
+          <td>${node.port}</td>
+          <td>${node.model}</td>
+          <td>${node.hardware}</td>
+          <td>${node.max_tokens}</td>
+          <td>${node.supports_streaming}</td>
+          <td>${node.inference_server}</td>
+          <td>${node.last_seen}</td>`;
+        tbody.appendChild(tr);
+      });
+
+    } catch (err) {
+      console.error("❌ Error loading nodes:", err.message);
+      document.getElementById("response").textContent = "⚠️ Failed to load nodes: " + err.message;
+    }
+  }
+
+  async function submitQuery() {
+    const query = document.getElementById("query").value;
+
+    try {
+      const res = await fetch(COORDINATOR_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ query })
+      });
+
+      const data = await res.json();
+      document.getElementById("response").textContent = JSON.stringify(data, null, 2);
+
+      const selected = data?.node;
+      if (selected) {
+        highlightSelectedNode(selected.host, selected.port);
+      }
+
+      await loadNodes();
+    } catch (err) {
+      console.error("❌ Query failed:", err);
+      document.getElementById("response").textContent = "❌ Failed to send query:\n" + err;
+    }
+  }
+
+  function highlightSelectedNode(host, port) {
+    document.querySelectorAll("#nodes-table tbody tr").forEach(row => {
+      if (row.children[0].textContent === host && row.children[1].textContent === port) {
+        row.classList.add("selected");
+      } else {
+        row.classList.remove("selected");
+      }
+    });
+  }
+
+  window.onload = loadNodes;
+</script>
+
 </body>
 </html>

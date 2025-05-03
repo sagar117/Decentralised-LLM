@@ -1,14 +1,14 @@
 from fastapi import FastAPI, Request
-from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 import requests
-import random
+import json
+import os
+from fastapi.middleware.cors import CORSMiddleware
+
 
 app = FastAPI()
 
-# Dynamic node list
-nodes = []
 
-# Allow all origins for frontend access
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -17,31 +17,42 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-@app.post("/register_node")
-async def register_node(request: Request):
-    data = await request.json()
-    node_url = f"http://{data['host']}:{data['port']}"
-    if node_url not in nodes:
-        nodes.append(node_url)
-    print(f"Registered Node: {node_url}")
-    return {"message": "Node registered", "total_nodes": len(nodes)}
+
+BLOCKCHAIN_FOLDER = os.path.join(os.path.dirname(__file__), "../node/blockchain_folder")
+BLOCKCHAIN_PATH = os.path.join(BLOCKCHAIN_FOLDER, "blockchain.json")
+
+class QueryRequest(BaseModel):
+    query: str
 
 @app.post("/submit_query/")
-async def submit_query(request: Request):
-    data = await request.json()
-    query = data['query']
+def submit_query(req: QueryRequest):
+    # Load latest node list
+    if not os.path.exists(BLOCKCHAIN_PATH):
+        return {"error": "No available nodes"}
+
+    with open(BLOCKCHAIN_PATH) as f:
+        nodes = json.load(f)
 
     if not nodes:
         return {"error": "No available nodes"}
 
-    random.shuffle(nodes)
+    # Pick a random node (could be improved later)
+    import random
+    selected_node = random.choice(nodes)
+    node_url = f"http://{selected_node['host']}:{selected_node['port']}/process_query"
 
-    for node in nodes:
-        try:
-            res = requests.post(f"{node}/process_query", json={"query": query})
-            if res.status_code == 200:
-                return {"result": res.json()["result"], "node": node}
-        except Exception as e:
-            print(f"Failed node: {node}, Error: {e}")
-            continue
-    return {"error": "All nodes failed"}
+    try:
+        resp = requests.post(node_url, json={"query": req.query}, timeout=10)
+        return {
+            "response": resp.json(),
+            "node": selected_node
+        }
+    except Exception as e:
+        return {
+            "error": f"Failed to reach node at {selected_node['host']}:{selected_node['port']}",
+            "details": str(e)
+        }
+
+@app.get("/")
+def health():
+    return {"status": "Coordinator running"}

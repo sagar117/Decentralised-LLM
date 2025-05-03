@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Decentralised LLM Control Panel</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f0f0f0; }
+    tr.selected { background-color: #d2ffd2; }
+  </style>
+</head>
+<body>
+
+<h1>🧠 Decentralised LLM Control Panel</h1>
+
+<label for="query">Your Query:</label>
+<input type="text" id="query" size="60">
+<button onclick="submitQuery()">Submit</button>
+
+<h2>📡 Active Nodes</h2>
+<table id="nodes-table">
+  <thead>
+    <tr>
+      <th>Host</th>
+      <th>Port</th>
+      <th>Model</th>
+      <th>Hardware</th>
+      <th>Max Tokens</th>
+      <th>Streaming</th>
+      <th>Inference</th>
+      <th>Last Seen</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<h2>🧾 Response</h2>
+<pre id="response" style="background:#f9f9f9;padding:10px;border:1px solid #ddd;"></pre>
+
+<script>
+  const IPFS_GATEWAY = "https://ipfs.io/ipfs/";
+  const COORDINATOR_ENDPOINT = "http://127.0.0.1:8000/submit_query/";
+
+  async function loadNodes() {
+    const cidRes = await fetch('/node/current_cid.txt');
+    const cid = await cidRes.text();
+
+    const res = await fetch(IPFS_GATEWAY + cid.trim() + "/blockchain.json");
+    const nodes = await res.json();
+    const tbody = document.querySelector("#nodes-table tbody");
+    tbody.innerHTML = "";
+
+    nodes.forEach((node, index) => {
+      const tr = document.createElement("tr");
+      tr.dataset.index = index;
+      tr.innerHTML = `
+        <td>${node.host}</td>
+        <td>${node.port}</td>
+        <td>${node.model}</td>
+        <td>${node.hardware}</td>
+        <td>${node.max_tokens}</td>
+        <td>${node.supports_streaming}</td>
+        <td>${node.inference_server}</td>
+        <td>${node.last_seen}</td>`;
+      tbody.appendChild(tr);
+    });
+
+    return nodes;
+  }
+
+  async function submitQuery() {
+    const query = document.getElementById("query").value;
+    const res = await fetch(COORDINATOR_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ query })
+    });
+    const data = await res.json();
+    document.getElementById("response").textContent = JSON.stringify(data, null, 2);
+
+    const selected = data?.node;
+    if (selected) {
+      highlightSelectedNode(selected.host, selected.port);
+    }
+
+    await loadNodes();
+  }
+
+  function highlightSelectedNode(host, port) {
+    document.querySelectorAll("#nodes-table tbody tr").forEach(row => {
+      if (row.children[0].textContent === host && row.children[1].textContent === port) {
+        row.classList.add("selected");
+      } else {
+        row.classList.remove("selected");
+      }
+    });
+  }
+
+  window.onload = loadNodes;
+</script>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "model": "TinyLlama/TinyLlama-1.1B-Chat-v1.0",
+  "hardware": "A100",
+  "max_tokens": 2048,
+  "supports_streaming": true,
+  "inference_server": false
+}

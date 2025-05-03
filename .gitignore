@@ -8,8 +8,11 @@ venv/
 .env/
 
 # IPFS artifacts
-*.cid
+current_cid.txt
+blockchain_folder/
 blockchain.json
+*.cid
+
 
 # System files
 .DS_Store
